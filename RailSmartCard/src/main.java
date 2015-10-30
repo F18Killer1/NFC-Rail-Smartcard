@@ -1,51 +1,108 @@
 
 import java.io.*;
+import java.util.Scanner;
 
 public class main 
 {
 	final static String DATA_FILE = "D:/Eclipse/RailSmartCard/tmp/data";
+	final static String STATIONS_FILE = "D:/Eclipse/RailSmartCard/bin/Stations.txt";
 	
 	public static void main(String[] args)
 	{
-		String ID = null;
+		CardReader cReader = new CardReader();
 		Boolean isMessageDisplayed = false;
 		
-		while(true)
+		while(true)	
 		{
 			if(!isMessageDisplayed)
 			{
 				System.out.println("Please present card");
 				isMessageDisplayed = true;
 			}
-			waitOneSecond();			
-			if (doesIDFileExist())
+			cReader.systemPause();			
+			if (cReader.doesIDFileExist())
 			{			
-				ID = retrieveCardID(readIDFile());
-				
+				String ID = cReader.retrieveCardID(cReader.readIDFile());			
 				if (ID != "-1")
 				{
 					System.out.println("ID = " + ID);				
 					isMessageDisplayed = false;
 					System.out.println("");
 				}
-				deleteFile();	
+				cReader.deleteFile();	
 			}
 		}
 	}
 	
- 	private static Boolean doesIDFileExist()
+	private static void displayMainMenu()
 	{
-		File file = new File(DATA_FILE);
-		return file.exists();
+		System.out.println("Welcome to Rail Smartcard System");
+		System.out.println("Please select which mode to run system in:");
+		System.out.println("1 - Station");
+		System.out.println("2 - Conductor");
+		System.out.println("0 - Quit");
 	}
 	
-	private static String readIDFile() 
+	private static int selectOperatingMode()
+	{
+		int choice = -1;
+		
+		Scanner scanner = null;
+		try
+		{
+			scanner = new Scanner(System.in);
+			
+			while(choice > 2 || choice < 0)
+			{	
+				System.out.print("\nOption: ");
+				choice = scanner.nextInt();
+			}
+		}
+		finally
+		{
+			scanner.close();
+		}
+		
+		return choice;
+	}
+	
+	private static void displayStationMenu()
+	{
+		System.out.println("Please insert the station code (or 0 to return to main menu)");
+		System.out.println("Station code: ");
+		selectStationCode();
+	}
+	
+	private static String selectStationCode()
+	{
+		int choice = -1;
+		
+		Scanner scanner = null;
+		try
+		{
+			scanner = new Scanner(System.in);
+			
+			while(choice > 2 || choice < 0)
+			{	
+				System.out.print("\nOption: ");
+				choice = scanner.nextInt();
+			}
+		}
+		finally
+		{
+			scanner.close();
+		}
+		
+		return "";
+	}
+	
+	private static String searchStationFile()
 	{
 		String data = null;
 		FileReader fReader = null;
 		try
 		{
-			fReader = new FileReader(DATA_FILE);
+			fReader = new FileReader(STATIONS_FILE);
 			BufferedReader reader = new BufferedReader(fReader);	
 			data = reader.readLine();
 			fReader.close();
@@ -54,40 +111,65 @@ public class main
 		{
 			e.printStackTrace();
 		}
-		return data;
+		return "";
 	}
 	
-	private static String retrieveCardID(String data)
-	{
-		int start = data.indexOf("Text");
-		int end = data.indexOf("EncodingType");
-		
-		if((start != -1) || (end != -1))
-		{
-			return data.substring(start+7, end-3);
-		}
-		else
-		{
-			return "-1";
-		}
-	}
 	
-	private static void deleteFile()
-	{
-		File toBeDeleted = new File(DATA_FILE);
-		toBeDeleted.delete();
-		waitOneSecond();
-	}
-	
-	private static void waitOneSecond()
-	{
-		try
-		{
-			Thread.sleep(1000);
-		}
-		catch (Exception e)
-		{
-			e.printStackTrace();
-		}
-	}
+// 	private static Boolean doesIDFileExist()
+//	{
+//		File file = new File(DATA_FILE);
+//		return file.exists();
+//	}
+//	
+//	private static String readIDFile() 
+//	{
+//		String data = null;
+//		FileReader fReader = null;
+//		try
+//		{
+//			fReader = new FileReader(DATA_FILE);
+//			BufferedReader reader = new BufferedReader(fReader);	
+//			data = reader.readLine();
+//			fReader.close();
+//		} 
+//		catch (IOException e)
+//		{
+//			e.printStackTrace();
+//		}
+//		return data;
+//	}
+//	
+//	private static String retrieveCardID(String data)
+//	{
+//		int start = data.indexOf("Text");
+//		int end = data.indexOf("EncodingType");
+//		
+//		if((start != -1) || (end != -1))
+//		{
+//			return data.substring(start+7, end-3);
+//		}
+//		else
+//		{
+//			return "-1";
+//		}
+//	}
+//	
+//	private static void deleteFile()
+//	{
+//		File toBeDeleted = new File(DATA_FILE);
+//		toBeDeleted.delete();
+//		waitOneSecond();
+//	}
+//	
+//	private static void waitOneSecond()
+//	{
+//		try
+//		{
+//			Thread.sleep(1000);
+//		}
+//		catch (Exception e)
+//		{
+//			e.printStackTrace();
+//		}
+//	}
 }
