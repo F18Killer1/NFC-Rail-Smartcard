@@ -1,23 +1,16 @@
 
 public class Card 
 {
-	String _ID_ = null;
-	//Boolean _isCardValid_ = false;
+	private int _ID_ = 0;
 	
-	Card()
+	Card(int ID)
 	{
-		
+		this._ID_ = ID;
 	}
-	
-	Card(String ID)
-	{
-		_ID_ = ID;
-	}
-	
-	String getCardID()
+
+	public int getID() 
 	{
 		return _ID_;
-	}
-			
+	}	
 }
 

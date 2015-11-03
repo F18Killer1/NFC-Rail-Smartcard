@@ -1,13 +1,10 @@
 import java.io.*;
-import java.sql.*;
 
 public class CardReader 
 {
-	final private static String DATA_FILE = "D:/Eclipse/RailSmartCard/tmp/data";
+	final private static String DATA_FILE = "tmp/data";
 	
-	private int _MODE_ = 0;	
-	private String _STATION_NAME_;
-	private int _SERVICE_ID_;
+	DatabaseManager dbm;
 	private Boolean _PRESENT_CARD_MSG_ = false;
 	
 	CardReader()
@@ -15,55 +12,13 @@ public class CardReader
 		
 	}
 	
-	CardReader(int mode, String stationName)
-	{
-		_MODE_ = mode;
-		_STATION_NAME_ = stationName;
-		_SERVICE_ID_ = 0;
-		System.out.println("Intitialising boot sequence...");
-	}
-	
-	CardReader(int mode, int serviceID)
-	{
-		_MODE_ = mode;
-		_STATION_NAME_ = null;
-		_SERVICE_ID_ = serviceID;
-		System.out.println("Intitialising boot sequence...");
-	}
-		
-	private String getMode()
-	{
-		//DEBUG
-		if(_MODE_ == 3) { return "TEST"; }
-		// END DEBUG
-		
-		if(_MODE_ == 1)
-		{
-			return "STATION";
-		}
-		return "CONDUCTOR";
-	}
-	
-	private String getWelcomeMessage()
-	{
-		//DEBUG
-		if(_MODE_ == 3) { return "SYSTEM RUNNING IN TEST MODE"; }
-		// END DEBUG
-		
-		if(_MODE_ == 1)
-		{
-			return "THIS TERMINAL IS RUNNING AT " + _STATION_NAME_.toUpperCase() + " STATION";
-		}
-		return "THIS TERMINAL IS OPERATING ON SERVICE ID: " + _SERVICE_ID_;
-	}
-
-	private Boolean doesIDFileExist()
+	protected Boolean doesIDFileExist()
 	{
 		File file = new File(DATA_FILE);
 		return file.exists();
 	}
 	
-	private String readIDFile() 
+	protected String readIDFile() 
 	{
 		String data = null;
 		FileReader fReader = null;
@@ -81,7 +36,7 @@ public class CardReader
 		return data;
 	}
 	
-	private String retrieveCardID(String data)
+	protected String retrieveCardID(String data)
 	{
 		int start = data.indexOf("Text");
 		int end = data.indexOf("EncodingType");
@@ -96,14 +51,14 @@ public class CardReader
 		}
 	}
 	
-	private void deleteFile()
+	protected void deleteFile()
 	{
 		File toBeDeleted = new File(DATA_FILE);
 		toBeDeleted.delete();
 		systemPause();
 	}
 	
-	private void systemPause()
+	protected void systemPause()
 	{
 		try
 		{
@@ -120,7 +75,7 @@ public class CardReader
 		return (ID != "-1");
 	}
 	
-	private void resetMachine()
+	protected void resetMachine()
 	{
 		_PRESENT_CARD_MSG_ = false;
 		deleteFile();
@@ -128,14 +83,10 @@ public class CardReader
 	
 	public void run()
 	{
-		DatabaseManager dbm = new DatabaseManager();
-		System.out.println("*** SYSTEM RUNNING IN " + getMode() + " MODE ***");
-		System.out.println("*** " + getWelcomeMessage() +" ***\n");
-
-		//System.exit(1);
-		
+		dbm = new DatabaseManager();
+	
 		resetMachine();			//Enable clean file data on start-up
-		while(_MODE_ != 0)	
+		while(true)	
 		{	
 			if(!_PRESENT_CARD_MSG_)
 			{
@@ -149,16 +100,18 @@ public class CardReader
 				
 				if (cardValidated)
 				{
-					Card card = new Card(retrieveCardID(readIDFile()));
-					
-					if (card.getCardID().equals("SHUTDOWN"))
+					String id_str = retrieveCardID(readIDFile());
+													
+					if (id_str.equals("SHUTDOWN"))
 					{
 						resetMachine();
 						break;
 					}
 					else
 					{
-						System.out.println("ID = " + card.getCardID() + "\n");
+						//System.out.println("ID = " + id + "\n");
+						int id_int = Integer.parseInt(id_str);
+						dbm.performDatabaseOperations(new Card(id_int));
 					}
 				}
 				else
@@ -170,5 +123,7 @@ public class CardReader
 		}
 		System.out.println("Executing SHUTDOWN procedures...");
 		dbm.closeDBConnection();
+		System.out.println("-> Terminating all services\t\t[ SUCCESS ]");
+		System.exit(0);
 	}
 }

@@ -4,7 +4,7 @@ public class main
 {
 	public static void main(String[] args)
 	{
-		CardReader cReader = null;
+		// ********** UPDATED *********** CardReader cReader = null;
 		
 		/*Scanner scanner = new Scanner(System.in);
 		System.out.print("Enter operating mode (1:Station, 2:Conductor): ");
@@ -31,9 +31,11 @@ public class main
 		scanner.close();*/
 		
 		//DEBUG CODE
-		cReader = new CardReader(3, "Test");
+		// ********** UPDATED ***********  cReader = new CardReader(3, "Test");
 		//END DEBUG CODE
 		
-		cReader.run();
+		// ********** UPDATED ***********  cReader.run();
+		
+		CardReaderManager crm = new CardReaderManager();
 	}	
 }
