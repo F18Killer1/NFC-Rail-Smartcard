@@ -1,4 +1,5 @@
 import java.io.*;
+import java.sql.*;
 
 public class CardReader 
 {
@@ -7,6 +8,7 @@ public class CardReader
 	private int _MODE_ = 0;	
 	private String _STATION_NAME_;
 	private int _SERVICE_ID_;
+	private Boolean _PRESENT_CARD_MSG_ = false;
 	
 	CardReader()
 	{
@@ -18,6 +20,7 @@ public class CardReader
 		_MODE_ = mode;
 		_STATION_NAME_ = stationName;
 		_SERVICE_ID_ = 0;
+		System.out.println("Intitialising boot sequence...");
 	}
 	
 	CardReader(int mode, int serviceID)
@@ -25,10 +28,15 @@ public class CardReader
 		_MODE_ = mode;
 		_STATION_NAME_ = null;
 		_SERVICE_ID_ = serviceID;
+		System.out.println("Intitialising boot sequence...");
 	}
 		
 	private String getMode()
 	{
+		//DEBUG
+		if(_MODE_ == 3) { return "TEST"; }
+		// END DEBUG
+		
 		if(_MODE_ == 1)
 		{
 			return "STATION";
@@ -38,6 +46,10 @@ public class CardReader
 	
 	private String getWelcomeMessage()
 	{
+		//DEBUG
+		if(_MODE_ == 3) { return "SYSTEM RUNNING IN TEST MODE"; }
+		// END DEBUG
+		
 		if(_MODE_ == 1)
 		{
 			return "THIS TERMINAL IS RUNNING AT " + _STATION_NAME_.toUpperCase() + " STATION";
@@ -103,30 +115,60 @@ public class CardReader
 		}
 	}
 	
+	private Boolean validateCardID(String ID)
+	{
+		return (ID != "-1");
+	}
+	
+	private void resetMachine()
+	{
+		_PRESENT_CARD_MSG_ = false;
+		deleteFile();
+	}
+	
 	public void run()
 	{
+		DatabaseManager dbm = new DatabaseManager();
 		System.out.println("*** SYSTEM RUNNING IN " + getMode() + " MODE ***");
 		System.out.println("*** " + getWelcomeMessage() +" ***\n");
-		Boolean isMessageDisplayed = false;
-		while(true)	
+
+		//System.exit(1);
+		
+		resetMachine();			//Enable clean file data on start-up
+		while(_MODE_ != 0)	
 		{	
-			if(!isMessageDisplayed)
+			if(!_PRESENT_CARD_MSG_)
 			{
 				System.out.println("Please present card");
-				isMessageDisplayed = true;
+				_PRESENT_CARD_MSG_ = true;
 			}
 			systemPause();			
 			if (doesIDFileExist())
 			{			
-				String ID = retrieveCardID(readIDFile());			
-				if (ID != "-1")
+				Boolean cardValidated = validateCardID(retrieveCardID(readIDFile()));
+				
+				if (cardValidated)
 				{
-					System.out.println("ID = " + ID);				
-					isMessageDisplayed = false;
-					System.out.println("");
+					Card card = new Card(retrieveCardID(readIDFile()));
+					
+					if (card.getCardID().equals("SHUTDOWN"))
+					{
+						resetMachine();
+						break;
+					}
+					else
+					{
+						System.out.println("ID = " + card.getCardID() + "\n");
+					}
 				}
-				deleteFile();	
+				else
+				{
+					System.out.println("Card unable to be validated, please try again or seek assistance!\n");
+				}
+				resetMachine();
 			}
-		}		
+		}
+		System.out.println("Executing SHUTDOWN procedures...");
+		dbm.closeDBConnection();
 	}
 }
