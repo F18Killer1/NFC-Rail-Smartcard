@@ -1,4 +1,5 @@
 import java.io.*;
+import java.sql.SQLException;
 
 public class CardReader 
 {
@@ -81,7 +82,7 @@ public class CardReader
 		deleteFile();
 	}
 	
-	public void run()
+	public void run() 
 	{
 		dbm = new DatabaseManager();
 	
@@ -94,13 +95,14 @@ public class CardReader
 				_PRESENT_CARD_MSG_ = true;
 			}
 			systemPause();			
-			if (doesIDFileExist())
-			{			
-				Boolean cardValidated = validateCardID(retrieveCardID(readIDFile()));
+			//if (doesIDFileExist())
+			//{			
+				//Boolean cardValidated = validateCardID(retrieveCardID(readIDFile()));
 				
-				if (cardValidated)
-				{
-					String id_str = retrieveCardID(readIDFile());
+				//if (cardValidated)
+				//{
+					//String id_str = retrieveCardID(readIDFile());
+					String id_str = "1099";
 													
 					if (id_str.equals("SHUTDOWN"))
 					{
@@ -111,15 +113,20 @@ public class CardReader
 					{
 						//System.out.println("ID = " + id + "\n");
 						int id_int = Integer.parseInt(id_str);
-						dbm.performDatabaseOperations(new Card(id_int));
+						try {
+							dbm.performDatabaseOperations(new Card(id_int));
+						} catch (SQLException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
 					}
-				}
-				else
-				{
-					System.out.println("Card unable to be validated, please try again or seek assistance!\n");
-				}
-				resetMachine();
-			}
+				//}
+				//else
+				//{
+					//System.out.println("Card unable to be validated, please try again or seek assistance!\n");
+				//}
+				//resetMachine();
+			//}
 		}
 		System.out.println("Executing SHUTDOWN procedures...");
 		dbm.closeDBConnection();

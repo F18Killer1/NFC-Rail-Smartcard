@@ -39,18 +39,56 @@ public class DatabaseManager
 		}
 	}
 	
-	public void performDatabaseOperations(Card card)
+	public void performDatabaseOperations(Card card) throws SQLException
 	{
 		System.out.println("ID of card: " + card.getID());
 		String operation = calculateCardOperation(card.getID());
+		
+		switch(operation)
+		{
+		case "OFF":
+			touchOn();
+			break;
+			
+		case "ON":
+			touchOff();
+			break;
+			
+		default: 
+			System.out.println("An unknown error occurred! System shutting down!");
+			System.exit(1);
+		}
+		
+		
+		
+		System.exit(1);
+		
 	}
 	
-	public String calculateCardOperation(int id)
+	private void touchOn()
 	{
-		return "";
+		System.out.println("Touching On...");
 	}
 	
-	public ResultSet queryDatabase(String query) throws SQLException
+	private void touchOff()
+	{
+		System.out.println("Touching Off...");
+	}
+	
+	private String calculateCardOperation(int id) throws SQLException
+	{
+		ResultSet results = queryDatabase("SELECT touchStatus FROM card WHERE cardID =" + id + " ORDER BY cardID DESC;");
+		String touchStatus = null;
+		
+		while(results.next())
+		{
+			touchStatus = results.getString("touchStatus");
+		}
+		
+		return touchStatus;
+	}
+	
+	private ResultSet queryDatabase(String query) throws SQLException
 	{
 		Statement statement = _CONNECTION_.createStatement();
 		return statement.executeQuery(query);
