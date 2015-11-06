@@ -66,7 +66,7 @@ public class CardReader
 				if (cardValidated) 
 				{ 
 					String id_str = retrieveCardID(readIDFile()); */
-					String id_str = "1099"; //UNCOMMENT
+					String id_str = "94"; //UNCOMMENT
 													
 					if (id_str.equals("SHUTDOWN"))
 					{
@@ -104,6 +104,11 @@ public class CardReader
 	public int getServiceID()
 	{
 		return _serviceID;
+	}
+	
+	public String getStationName()
+	{
+		return _stationName;
 	}
 	
 	private Boolean doesIDFileExist()

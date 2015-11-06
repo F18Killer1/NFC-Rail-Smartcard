@@ -13,7 +13,8 @@ public class CardReaderManager
 
 		//***** DEBUG CODE ********
 		//new StationReader("nottingham");
-		new CardReader(1001).run();
+		new CardReader("Nottingham").run();
+		//new CardReader(1069).run();
 		//**** END DEBUG CODE *****
 		
 		/*Scanner scanner = new Scanner(System.in);

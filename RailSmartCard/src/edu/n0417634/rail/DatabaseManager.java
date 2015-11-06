@@ -2,17 +2,21 @@ package edu.n0417634.rail;
 
 import java.sql.*;
 import java.time.*;
+import java.util.*;
 
 public class DatabaseManager 
 {
-	final static String JDBC_DRIVER = "com.mysql.jdbc.Driver";  
-	final static String URL = "jdbc:mysql://localhost:3306/electronicadvancetickets";
-	final static String USERNAME = "SYSTEM";
-	final static String PASSWORD = "5p5$Dmh_YAcA";
-	Connection _connection;
-	String _todaysDate;
-	Card _card;
-	CardReader _reader;
+	final private static String JDBC_DRIVER = "com.mysql.jdbc.Driver";  
+	final private static String URL = "jdbc:mysql://localhost:3306/electronicadvancetickets";
+	final private static String USERNAME = "SYSTEM";
+	final private static String PASSWORD = "5p5$Dmh_YAcA";
+	
+	private Connection _connection;
+	private Card _card;
+	private CardReader _reader;
+	
+	private Calendar _calendar;
+	private String _todaysDate;
 	
 	DatabaseManager()
 	{
@@ -20,6 +24,7 @@ public class DatabaseManager
 		_todaysDate = null;
 		_card = null;
 		_reader = null;
+		_calendar = new GregorianCalendar();
 	}
 	
 	public void init()
@@ -29,20 +34,72 @@ public class DatabaseManager
 	
 	public void updateDate()
 	{
-		LocalDate today = LocalDate.now();
-		int day = today.getDayOfMonth();
-		int mon = today.getMonthValue();
-		int yr = today.getYear();
-		
+		int day =  _calendar.get(Calendar.DAY_OF_MONTH);
+		int month =  _calendar.get(Calendar.MONTH) +1;
+		int year =  _calendar.get(Calendar.YEAR);
+				
 		if(day < 10) 
 		{ 
-			_todaysDate = yr + "-" + mon + "-" + "0" + day; 
+			_todaysDate = year + "-" + month + "-" + "0" + day; 
 		}
 		else 
 		{ 
-			_todaysDate = yr + "-" + mon + "-" + day; 
+			_todaysDate = year + "-" + month + "-" + day; 
 		}
 	}
+	
+	
+	private Boolean validateTimeOnTicket(String ticketTime, String dateOnTicket, String toStation)
+	{
+		int hoursNow = _calendar.get(Calendar.HOUR_OF_DAY);
+		int minutesNow = _calendar.get(Calendar.MINUTE);
+		int timeNow = Integer.parseInt(Integer.toString(hoursNow) + Integer.toString(minutesNow));
+		
+		int timeOnTicket = 0;
+		
+		String[] time = ticketTime.split(":");
+		
+		for (int i=0; i< time.length -1; i++)
+		{
+			timeOnTicket = Integer.parseInt(timeOnTicket + time[i]);
+		}
+		
+		int timeDiff = timeNow - timeOnTicket;
+
+		if(toStation == _reader.getStationName())
+		{
+			//not working as they can use the same ticket to get IN the station after going OUT the same one
+			
+			/*Statement statement = _connection.createStatement();
+			String updateIsUsed = "update ticket set isUsed=1 where "
+			return statement.executeQuery(query);*/
+			return true;
+		}
+		
+		if(timeDiff > 0)
+		{
+			System.out.println("*-----------------------------*");
+			System.out.println("* TICKET *NOT* VALID!");
+			System.out.println("*-----------------------------*");
+			System.out.println("* EXPIRED AT " + ticketTime + " ON " + dateOnTicket + " ***");
+			System.out.println("*-----------------------------*\n");
+		}
+		else if(timeDiff < -100)	
+		{
+			System.out.println("*-----------------------------*");
+			System.out.println("* TICKET *NOT* VALID!");
+			System.out.println("*-----------------------------*");
+			System.out.println("* VALID BETWEEN " + (Integer.parseInt(time[0]) -1) + ":"  + time[1] 
+					 + " AND " + ticketTime + " TODAY ONLY");
+			System.out.println("*-----------------------------*\n");
+		}
+		else
+		{
+			return true;
+		}		
+		return false;
+	}
+	
 	
 	private void connectToDB()
 	{
@@ -99,27 +156,52 @@ public class DatabaseManager
 	
 	private void processCardInStationMode() throws SQLException 
 	{
-		//same as conductor mode but the following...
 		
-		/*
-		 * 1. Check that the date on the ticket is correct
-		 * 2. check the time is less than or greater than 1hr before ticket time
-		 * 3. check station is correct (can pass through or not)
-		 * 
-		 * */
+		ResultSet results = queryDatabase("SELECT * FROM ticket WHERE cardID=" + _card.getID() 
+		+ " AND (validFromStation='" + _reader.getStationName() + "' OR validToStation='" +  _reader.getStationName() + "')" 
+				+" AND validityDate='" + _todaysDate + "';"); 
+				
+		if (!results.isBeforeFirst()) 
+		{    
+			System.out.println("*-----------------------------*");
+			System.out.println("* TICKET *NOT* VALID!");
+			System.out.println("*-----------------------------*");
+			System.out.println("* NO TICKET LOADED FOR TODAY ");
+			System.out.println("*-----------------------------*");
+		}
+		else
+		{
+			while(results.next())
+			{
+				String timeOnTicket = results.getString("validityTime").toString();
+				String dateOnTicket = results.getString("validityDate").toString();
+				String endStation = results.getString("validToStation").toString();
+				
+				Boolean isTimeOfScanValid = validateTimeOnTicket(timeOnTicket, dateOnTicket, endStation);
+				
+				if(isTimeOfScanValid)
+				{											
+					System.out.println("*-----------------------------*");
+					System.out.println("* TICKET VALID!");
+					System.out.println("*-----------------------------*");
+					System.out.println("* OPENING BARRIERS AT " + _reader.getStationName().toUpperCase());
+					System.out.println("*-----------------------------*\n");
+				}
+			}
+		}
 	}
-	
 	
 	private void processCardInConductorMode() throws SQLException 
 	{
-		ResultSet results = queryDatabase("SELECT * FROM ticket WHERE cardID=" + _card.getID() + " AND serviceID=" + _reader.getServiceID() + " AND validityDate='" + _todaysDate + "';");
+		ResultSet results = queryDatabase("SELECT * FROM ticket WHERE cardID=" + _card.getID() 
+		+ " AND serviceID=" + _reader.getServiceID() + " AND validityDate='" + _todaysDate + "';");
 		
 		String ticketID_str = null;
 		int ticketID_int = 0;
 		
 		if (!results.isBeforeFirst()) 
 		{    
-			 System.out.println("*** TICKET MOT VALID! ***"); 
+			 System.out.println("*** TICKET NOT VALID! ***"); 
 		}
 		else
 		{
@@ -130,15 +212,17 @@ public class DatabaseManager
 				
 				if(ticketID_int == _reader.getServiceID())
 				{
+					String tktType = results.getString("ageGroup") + " " + results.getString("ticketType");
+					
 					System.out.println("*-----------------------------*");
 					System.out.println("* TICKET VALID!");
 					System.out.println("*-----------------------------*");
-					System.out.println("TYPE  : " + results.getString("ticketType"));
+					System.out.println("TYPE  : " + tktType.toUpperCase());
+					System.out.println("CLASS : " + results.getString("class"));
 					System.out.println("FROM  : " + results.getString("validFromStation"));
 					System.out.println("TO    : " + results.getString("validToStation"));
-					System.out.println("CLASS : " + results.getString("class"));
 					System.out.println("SEAT  : " + results.getString("seatReservation"));
-					System.out.println("*-----------------------------*");
+					System.out.println("*-----------------------------*\n");
 				}
 			}
 		}
