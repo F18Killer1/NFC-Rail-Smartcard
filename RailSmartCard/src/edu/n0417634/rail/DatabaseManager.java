@@ -6,7 +6,7 @@ import java.util.*;
 
 public class DatabaseManager 
 {
-	final private static String JDBC_DRIVER = "com.mysql.jdbc.Driver";  
+	//final private static String JDBC_DRIVER = "com.mysql.jdbc.Driver";  
 	final private static String URL = "jdbc:mysql://localhost:3306/electronicadvancetickets";
 	final private static String USERNAME = "SYSTEM";
 	final private static String PASSWORD = "5p5$Dmh_YAcA";
@@ -49,8 +49,10 @@ public class DatabaseManager
 	}
 	
 	
-	private Boolean validateTimeOnTicket(String ticketTime, String dateOnTicket, String toStation)
+	//private Boolean validateTimeOnTicket(String ticketTime, String dateOnTicket, String toStation)
+	private Boolean validateTimeOnTicket(Ticket ticket)
 	{
+		//fix this		
 		int hoursNow = _calendar.get(Calendar.HOUR_OF_DAY);
 		int minutesNow = _calendar.get(Calendar.MINUTE);
 		int timeNow = Integer.parseInt(Integer.toString(hoursNow) + Integer.toString(minutesNow));
@@ -66,7 +68,7 @@ public class DatabaseManager
 		
 		int timeDiff = timeNow - timeOnTicket;
 
-		if(toStation == _reader.getStationName())
+		if(toStation.equals(_reader.getStationName()))
 		{
 			//not working as they can use the same ticket to get IN the station after going OUT the same one
 			
@@ -159,25 +161,34 @@ public class DatabaseManager
 		
 		ResultSet results = queryDatabase("SELECT * FROM ticket WHERE cardID=" + _card.getID() 
 		+ " AND (validFromStation='" + _reader.getStationName() + "' OR validToStation='" +  _reader.getStationName() + "')" 
-				+" AND validityDate='" + _todaysDate + "';"); 
+				+" AND validityDate='" + _todaysDate + "' AND isUsed=0;"); 
 				
 		if (!results.isBeforeFirst()) 
 		{    
 			System.out.println("*-----------------------------*");
 			System.out.println("* TICKET *NOT* VALID!");
 			System.out.println("*-----------------------------*");
-			System.out.println("* NO TICKET LOADED FOR TODAY ");
+			System.out.println("* INFORMATION IN SYSTEM DOES NOT MATCH CARD ");
+			System.out.println("* PLEASE SEEK ASSISTANCE ");
 			System.out.println("*-----------------------------*");
 		}
 		else
 		{
 			while(results.next())
 			{
-				String timeOnTicket = results.getString("validityTime").toString();
-				String dateOnTicket = results.getString("validityDate").toString();
-				String endStation = results.getString("validToStation").toString();
+				//new imp
+				Ticket tkt = new Ticket (results.getInt("ticketID"), results.getInt("cardID"), results.getInt("serviceID"),
+						results.getString("validFromStation"), results.getString("validToStation"), results.getString("ticketType"), results.getString("class"), 
+						results.getString("purchaseDateTime").toString(), results.getString("validityDate").toString(),
+						results.getString("validityTime").toString(), results.getString("seatReservation"), results.getString("ageGroup"), 
+						results.getDouble("price"), results.getBoolean("isUsed"));
 				
-				Boolean isTimeOfScanValid = validateTimeOnTicket(timeOnTicket, dateOnTicket, endStation);
+				/*String timeOnTicket = results.getString("validityTime").toString();
+				String dateOnTicket = results.getString("validityDate").toString();
+				String endStation = results.getString("validToStation").toString();*/
+				
+				//Boolean isTimeOfScanValid = validateTimeOnTicket(timeOnTicket, dateOnTicket, endStation);
+				Boolean isTimeOfScanValid = validateTimeOnTicket(tkt);
 				
 				if(isTimeOfScanValid)
 				{											

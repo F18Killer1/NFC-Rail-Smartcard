@@ -13,7 +13,7 @@ public class CardReaderManager
 
 		//***** DEBUG CODE ********
 		//new StationReader("nottingham");
-		new CardReader("Nottingham").run();
+		new CardReader("London Kings Cross").run();
 		//new CardReader(1069).run();
 		//**** END DEBUG CODE *****
 		
