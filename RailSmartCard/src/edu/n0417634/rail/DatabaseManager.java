@@ -14,94 +14,19 @@ public class DatabaseManager
 	private Connection _connection;
 	private Card _card;
 	private CardReader _reader;
-	
-	private Calendar _calendar;
-	private String _todaysDate;
-	
+	private DateTimeController _dtControl;
+		
 	DatabaseManager()
 	{
 		_connection = null;
-		_todaysDate = null;
 		_card = null;
 		_reader = null;
-		_calendar = new GregorianCalendar();
 	}
 	
 	public void init()
 	{	
 		connectToDB();
 	}
-	
-	public void updateDate()
-	{
-		int day =  _calendar.get(Calendar.DAY_OF_MONTH);
-		int month =  _calendar.get(Calendar.MONTH) +1;
-		int year =  _calendar.get(Calendar.YEAR);
-				
-		if(day < 10) 
-		{ 
-			_todaysDate = year + "-" + month + "-" + "0" + day; 
-		}
-		else 
-		{ 
-			_todaysDate = year + "-" + month + "-" + day; 
-		}
-	}
-	
-	
-	//private Boolean validateTimeOnTicket(String ticketTime, String dateOnTicket, String toStation)
-	private Boolean validateTimeOnTicket(Ticket ticket)
-	{
-		//fix this		
-		int hoursNow = _calendar.get(Calendar.HOUR_OF_DAY);
-		int minutesNow = _calendar.get(Calendar.MINUTE);
-		int timeNow = Integer.parseInt(Integer.toString(hoursNow) + Integer.toString(minutesNow));
-		
-		int timeOnTicket = 0;
-		
-		String[] time = ticketTime.split(":");
-		
-		for (int i=0; i< time.length -1; i++)
-		{
-			timeOnTicket = Integer.parseInt(timeOnTicket + time[i]);
-		}
-		
-		int timeDiff = timeNow - timeOnTicket;
-
-		if(toStation.equals(_reader.getStationName()))
-		{
-			//not working as they can use the same ticket to get IN the station after going OUT the same one
-			
-			/*Statement statement = _connection.createStatement();
-			String updateIsUsed = "update ticket set isUsed=1 where "
-			return statement.executeQuery(query);*/
-			return true;
-		}
-		
-		if(timeDiff > 0)
-		{
-			System.out.println("*-----------------------------*");
-			System.out.println("* TICKET *NOT* VALID!");
-			System.out.println("*-----------------------------*");
-			System.out.println("* EXPIRED AT " + ticketTime + " ON " + dateOnTicket + " ***");
-			System.out.println("*-----------------------------*\n");
-		}
-		else if(timeDiff < -100)	
-		{
-			System.out.println("*-----------------------------*");
-			System.out.println("* TICKET *NOT* VALID!");
-			System.out.println("*-----------------------------*");
-			System.out.println("* VALID BETWEEN " + (Integer.parseInt(time[0]) -1) + ":"  + time[1] 
-					 + " AND " + ticketTime + " TODAY ONLY");
-			System.out.println("*-----------------------------*\n");
-		}
-		else
-		{
-			return true;
-		}		
-		return false;
-	}
-	
 	
 	private void connectToDB()
 	{
@@ -136,6 +61,12 @@ public class DatabaseManager
 		Statement statement = _connection.createStatement();
 		return statement.executeQuery(query);
 	}
+	
+	private void updateDatabase(String query) throws SQLException
+	{
+		Statement statement = _connection.createStatement();
+		statement.executeQuery(query);
+	}
 
 	public void performDatabaseOperations(Card card, CardReader reader) throws SQLException  
 	{
@@ -158,17 +89,19 @@ public class DatabaseManager
 	
 	private void processCardInStationMode() throws SQLException 
 	{
+		_dtControl = new DateTimeController();
+		String dateToday = _dtControl.getTodaysDate();
 		
 		ResultSet results = queryDatabase("SELECT * FROM ticket WHERE cardID=" + _card.getID() 
-		+ " AND (validFromStation='" + _reader.getStationName() + "' OR validToStation='" +  _reader.getStationName() + "')" 
-				+" AND validityDate='" + _todaysDate + "' AND isUsed=0;"); 
+				+ " AND (validFromStation='" + _reader.getStationName() + "' OR validToStation='" +  _reader.getStationName() + "')" 
+				+" AND validityDate='" + dateToday + "' AND isUsed=0;"); //AND isUsed=0
 				
 		if (!results.isBeforeFirst()) 
 		{    
 			System.out.println("*-----------------------------*");
 			System.out.println("* TICKET *NOT* VALID!");
 			System.out.println("*-----------------------------*");
-			System.out.println("* INFORMATION IN SYSTEM DOES NOT MATCH CARD ");
+			System.out.println("* INFORMATION MISMATCH ");
 			System.out.println("* PLEASE SEEK ASSISTANCE ");
 			System.out.println("*-----------------------------*");
 		}
@@ -176,21 +109,15 @@ public class DatabaseManager
 		{
 			while(results.next())
 			{
-				//new imp
 				Ticket tkt = new Ticket (results.getInt("ticketID"), results.getInt("cardID"), results.getInt("serviceID"),
 						results.getString("validFromStation"), results.getString("validToStation"), results.getString("ticketType"), results.getString("class"), 
 						results.getString("purchaseDateTime").toString(), results.getString("validityDate").toString(),
 						results.getString("validityTime").toString(), results.getString("seatReservation"), results.getString("ageGroup"), 
 						results.getDouble("price"), results.getBoolean("isUsed"));
 				
-				/*String timeOnTicket = results.getString("validityTime").toString();
-				String dateOnTicket = results.getString("validityDate").toString();
-				String endStation = results.getString("validToStation").toString();*/
+				Boolean isValidTicket = tkt.isTicketValid(tkt);
 				
-				//Boolean isTimeOfScanValid = validateTimeOnTicket(timeOnTicket, dateOnTicket, endStation);
-				Boolean isTimeOfScanValid = validateTimeOnTicket(tkt);
-				
-				if(isTimeOfScanValid)
+				if(isValidTicket)
 				{											
 					System.out.println("*-----------------------------*");
 					System.out.println("* TICKET VALID!");
@@ -198,14 +125,29 @@ public class DatabaseManager
 					System.out.println("* OPENING BARRIERS AT " + _reader.getStationName().toUpperCase());
 					System.out.println("*-----------------------------*\n");
 				}
+				else
+				{
+					System.out.println("*-----------------------------*");
+					System.out.println("* TICKET INVALID!");
+					System.out.println("*-----------------------------*");
+					System.out.println("* " + tkt.getErrorMessage());
+					System.out.println("*-----------------------------*");
+				}
+				
+				if(tkt.getIsUsed())
+				{
+					String updateQuery = "UPDATE ticket SET isUsed=1 WHERE ticketID=" + tkt.getTicketID() + ";";
+					this.updateDatabase(updateQuery);
+				}
 			}
 		}
+		results.close();
 	}
 	
 	private void processCardInConductorMode() throws SQLException 
 	{
 		ResultSet results = queryDatabase("SELECT * FROM ticket WHERE cardID=" + _card.getID() 
-		+ " AND serviceID=" + _reader.getServiceID() + " AND validityDate='" + _todaysDate + "';");
+		+ " AND serviceID=" + _reader.getServiceID() + " AND validityDate=NOW();");
 		
 		String ticketID_str = null;
 		int ticketID_int = 0;

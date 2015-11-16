@@ -6,6 +6,7 @@ public class Ticket
 	private String _validFromStation, _validToStation, _ticketType, _ticketClass, _purchaseDate, _validityDate, _validityTime, _seatReservation, _ageGroup;
 	private double _price; 
 	private Boolean _isUsed;
+	private String _errorMessage;
 	
 	Ticket()
 	{
@@ -21,7 +22,8 @@ public class Ticket
 		_validityTime = null;
 		_seatReservation = null; 
 		_ageGroup = null;
-		_isUsed = false;		
+		_isUsed = false;	
+		_errorMessage = null;
 	}
 	
 	Ticket(int tID, int cID, int sID, String from, String to, String type, String tClass, String pDate, 
@@ -39,6 +41,97 @@ public class Ticket
 		_validityTime = vTime;
 		_seatReservation = seat; 
 		_ageGroup = age;
-		_isUsed = isUsed;		
+		_isUsed = isUsed;	
+		_errorMessage = null;
+	}
+	
+	public Boolean isTicketValid(Ticket tkt)
+	{		
+		if(this.getTicketType().contains("Advance"))
+		{
+			int timeNow = new DateTimeController().getTimeNow();
+			int ticketTime = this.stripColon(this.getValidityTime());
+			int timeDiff = timeNow - ticketTime;
+						
+			if(timeDiff > 0)
+			{
+				_errorMessage = "Ticket expired on " + this.formatDate(this.getValidityDate()) + "\n* at " + this.stripSeconds(this.getValidityTime());
+				return false;
+			}
+			else if (timeDiff < -100)
+			{
+				_errorMessage = "Ticket valid on " + this.formatDate(this.getValidityDate()) +  "\n* between " + this.getValidityStartTime(this.getValidityTime()) 
+													+ " and " + this.stripSeconds(this.getValidityTime());
+				return false;
+			}
+		}
+		return true;
+	}
+
+	/*if(toStation.equals(_reader.getStationName()))
+	{
+		//not working as they can use the same ticket to get IN the station after going OUT the same one
+		
+		/*Statement statement = _connection.createStatement();
+		String updateIsUsed = "update ticket set isUsed=1 where "
+		return statement.executeQuery(query);
+		return true;
+	}*/
+	
+		
+	private String formatDate(String date)
+	{
+		String[] dates = date.split("-");
+		return dates[2] + "/" + dates[1] + "/" + dates[0];		
+	}
+		
+	private String getValidityStartTime(String time)
+	{
+		String[] times = time.split(":");
+		return (Integer.parseInt(times[0]) -1) + ":" + times[1];
+	}
+	
+	private int stripColon(String time)
+	{
+		String[] times = time.split(":");
+		return Integer.parseInt(times[0] + "" +times[1]); 
+	}
+	
+	private String stripSeconds(String time)
+	{
+		String[] times = time.split(":");
+		return times[0] + ":" + times[1];
+	}	
+	
+	private String getTicketType()
+	{
+		return _ticketType;
+	}
+	
+	private String getValidityTime()
+	{
+		return _validityTime;
+	}
+	
+	public String getErrorMessage()
+	{
+		return _errorMessage;
+	}
+	
+	public Boolean getIsUsed()
+	{
+		return _isUsed;
+	}
+	
+	public int getTicketID()
+	{
+		return _ticketID;
+	}
+	
+	private String getValidityDate()
+	{
+		return _validityDate;
 	}
 }
+
+

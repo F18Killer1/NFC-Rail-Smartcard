@@ -28,8 +28,8 @@ public class CardReader
 		this._serviceID =0;
 		this._mode = "STATION";
 		
-		System.out.println("\nBoot sequence\t\t[ SUCCESS ]");
-		System.out.println("SYSTEM RUNNING IN STATION MODE @ ** " + this._stationName.toUpperCase() + " **");
+		//System.out.println("Boot sequence\t\t[ SUCCESS ]");
+		System.out.println("SYSTEM RUNNING IN STATION MODE AT ** " + this._stationName.toUpperCase() + " **");
 	}
 	
 	CardReader(int serviceID)
@@ -38,7 +38,7 @@ public class CardReader
 		this._stationName = null;
 		this._mode = "CONDUCTOR";
 		
-		System.out.println("\nBoot sequence\t\t[ SUCCESS ]");
+		//System.out.println("Boot sequence\t\t[ SUCCESS ]");
 		System.out.println("SYSTEM RUNNING IN CONDUCTOR MODE ON SERVICE ID: " + this._serviceID );
 	}
 	
@@ -76,7 +76,6 @@ public class CardReader
 					else
 					{
 						int id_int = Integer.parseInt(id_str);
-						dbm.updateDate();
 						dbm.performDatabaseOperations(new Card(id_int), this);
 						
 						break; //DEBUG

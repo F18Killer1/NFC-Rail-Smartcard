@@ -9,7 +9,7 @@ public class CardReaderManager
 	
 	public void start() throws SQLException
 	{
-		System.out.println("Initiating boot sequence...\n");
+		//System.out.println("Initiating boot sequence...\n");
 
 		//***** DEBUG CODE ********
 		//new StationReader("nottingham");
