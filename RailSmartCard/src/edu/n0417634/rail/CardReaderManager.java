@@ -12,9 +12,9 @@ public class CardReaderManager
 		//System.out.println("Initiating boot sequence...\n");
 
 		//***** DEBUG CODE ********
-		//new StationReader("nottingham");
-		new CardReader("London Kings Cross").run();
-		//new CardReader(1069).run();
+		//new CardReader("London Kings Cross").run();
+		//new CardReader("nottingham").run();
+		new CardReader(1069).run();
 		//**** END DEBUG CODE *****
 		
 		/*Scanner scanner = new Scanner(System.in);

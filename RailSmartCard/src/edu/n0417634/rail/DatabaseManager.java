@@ -65,7 +65,7 @@ public class DatabaseManager
 	private void updateDatabase(String query) throws SQLException
 	{
 		Statement statement = _connection.createStatement();
-		statement.executeQuery(query);
+		statement.executeUpdate(query);
 	}
 
 	public void performDatabaseOperations(Card card, CardReader reader) throws SQLException  
@@ -77,10 +77,12 @@ public class DatabaseManager
 		{
 			case "STATION":
 					processCardInStationMode();
+					new TicketHandler(_reader.getReaderMode());
 					break;
 					
 			case "CONDUCTOR":
 					processCardInConductorMode();
+					new TicketHandler(_reader.getReaderMode());
 					break;
 			
 			default: closeDBConnection();
@@ -94,16 +96,11 @@ public class DatabaseManager
 		
 		ResultSet results = queryDatabase("SELECT * FROM ticket WHERE cardID=" + _card.getID() 
 				+ " AND (validFromStation='" + _reader.getStationName() + "' OR validToStation='" +  _reader.getStationName() + "')" 
-				+" AND validityDate='" + dateToday + "' AND isUsed=0;"); //AND isUsed=0
+				+" AND validityDate='" + dateToday + "' AND isUsed=0;");
 				
 		if (!results.isBeforeFirst()) 
 		{    
-			System.out.println("*-----------------------------*");
-			System.out.println("* TICKET *NOT* VALID!");
-			System.out.println("*-----------------------------*");
-			System.out.println("* INFORMATION MISMATCH ");
-			System.out.println("* PLEASE SEEK ASSISTANCE ");
-			System.out.println("*-----------------------------*");
+			printInfoMismatchMessage();
 		}
 		else
 		{
@@ -134,10 +131,13 @@ public class DatabaseManager
 					System.out.println("*-----------------------------*");
 				}
 				
-				if(tkt.getIsUsed())
+				if (tkt.getTicketType().contains("Advance"))
 				{
-					String updateQuery = "UPDATE ticket SET isUsed=1 WHERE ticketID=" + tkt.getTicketID() + ";";
-					this.updateDatabase(updateQuery);
+					if(!tkt.getIsUsed() && tkt.getToStation().equals(_reader.getStationName()))
+					{
+						String updateQuery = "UPDATE ticket SET isUsed=1 WHERE ticketID=" + tkt.getTicketID() + ";";
+						this.updateDatabase(updateQuery);
+					}
 				}
 			}
 		}
@@ -146,21 +146,34 @@ public class DatabaseManager
 	
 	private void processCardInConductorMode() throws SQLException 
 	{
-		ResultSet results = queryDatabase("SELECT * FROM ticket WHERE cardID=" + _card.getID() 
-		+ " AND serviceID=" + _reader.getServiceID() + " AND validityDate=NOW();");
+		Vector<Ticket> passengerTickets = new Vector<Ticket>();	
+		_dtControl = new DateTimeController();
+		String dateToday = _dtControl.getTodaysDate();
+		
+		/*ResultSet results = queryDatabase("SELECT * FROM ticket WHERE cardID=" + _card.getID() 
+		+ " AND serviceID=" + _reader.getServiceID() + " AND validityDate=NOW();");*/
+		ResultSet results = queryDatabase("SELECT * FROM ticket WHERE cardID=" + _card.getID() + " AND validityDate='" + dateToday + "';");
 		
 		String ticketID_str = null;
 		int ticketID_int = 0;
 		
 		if (!results.isBeforeFirst()) 
 		{    
-			 System.out.println("*** TICKET NOT VALID! ***"); 
+			printInfoMismatchMessage();
 		}
 		else
 		{
 			while(results.next())
 			{
-				ticketID_str = results.getString("serviceID");
+				Ticket tkt = new Ticket (results.getInt("ticketID"), results.getInt("cardID"), results.getInt("serviceID"),
+						results.getString("validFromStation"), results.getString("validToStation"), results.getString("ticketType"), results.getString("class"), 
+						results.getString("purchaseDateTime").toString(), results.getString("validityDate").toString(),
+						results.getString("validityTime").toString(), results.getString("seatReservation"), results.getString("ageGroup"), 
+						results.getDouble("price"), results.getBoolean("isUsed"));
+				
+				passengerTickets.addElement(tkt);
+				
+				/*ticketID_str = results.getString("serviceID");
 				ticketID_int = Integer.parseInt(ticketID_str);
 				
 				if(ticketID_int == _reader.getServiceID())
@@ -176,10 +189,25 @@ public class DatabaseManager
 					System.out.println("TO    : " + results.getString("validToStation"));
 					System.out.println("SEAT  : " + results.getString("seatReservation"));
 					System.out.println("*-----------------------------*\n");
-				}
-			}
+				}*/
+			}			
+			Enumeration<Ticket> vEnum = passengerTickets.elements();
+		      System.out.println("\nElements in vector:");
+		      while(vEnum.hasMoreElements())
+		         System.out.print(vEnum.nextElement().getTicketID() + " ");
+			
+			//System.out.println(passengerTickets);
+			
 		}
 	}
 	
-	
+	private void printInfoMismatchMessage()
+	{
+		System.out.println("*-----------------------------*");
+		System.out.println("* TICKET *NOT* VALID!");
+		System.out.println("*-----------------------------*");
+		System.out.println("* INFORMATION MISMATCH ");
+		System.out.println("* PLEASE SEEK ASSISTANCE ");
+		System.out.println("*-----------------------------*");
+	}
 }

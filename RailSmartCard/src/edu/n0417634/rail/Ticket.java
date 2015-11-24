@@ -29,8 +29,8 @@ public class Ticket
 	Ticket(int tID, int cID, int sID, String from, String to, String type, String tClass, String pDate, 
 			String vDate, String vTime, String seat, String age, double price, Boolean isUsed)
 	{
-		_ticketID = tID;
-		_cardID = cID;
+		_ticketID = tID; 
+		_cardID = cID; 
 		_serviceID = sID;
 		_validFromStation = from; 
 		_validToStation = to; 
@@ -67,18 +67,7 @@ public class Ticket
 		}
 		return true;
 	}
-
-	/*if(toStation.equals(_reader.getStationName()))
-	{
-		//not working as they can use the same ticket to get IN the station after going OUT the same one
-		
-		/*Statement statement = _connection.createStatement();
-		String updateIsUsed = "update ticket set isUsed=1 where "
-		return statement.executeQuery(query);
-		return true;
-	}*/
 	
-		
 	private String formatDate(String date)
 	{
 		String[] dates = date.split("-");
@@ -103,7 +92,12 @@ public class Ticket
 		return times[0] + ":" + times[1];
 	}	
 	
-	private String getTicketType()
+	public String getToStation()
+	{
+		return _validToStation;
+	}
+	
+	public String getTicketType()
 	{
 		return _ticketType;
 	}
