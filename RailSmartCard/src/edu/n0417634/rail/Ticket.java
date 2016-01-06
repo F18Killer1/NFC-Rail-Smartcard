@@ -51,16 +51,16 @@ public class Ticket
 		{
 			int timeNow = new DateTimeController().getTimeNow();
 			int ticketTime = this.stripColon(this.getValidityTime());
-			int timeDiff = timeNow - ticketTime;
+			int timeDiff = timeNow - ticketTime;		
 						
 			if(timeDiff > 0)
 			{
-				_errorMessage = "Ticket expired on " + this.formatDate(this.getValidityDate()) + "\n* at " + this.stripSeconds(this.getValidityTime());
+				_errorMessage = "Ticket expired on " + this.formatDate(this.getValidityDate()) + " at " + this.stripSeconds(this.getValidityTime());
 				return false;
 			}
 			else if (timeDiff < -100)
 			{
-				_errorMessage = "Ticket valid on " + this.formatDate(this.getValidityDate()) +  "\n* between " + this.getValidityStartTime(this.getValidityTime()) 
+				_errorMessage = "Ticket valid on " + this.formatDate(this.getValidityDate()) +  " between " + this.getValidityStartTime(this.getValidityTime()) 
 													+ " and " + this.stripSeconds(this.getValidityTime());
 				return false;
 			}
@@ -92,6 +92,11 @@ public class Ticket
 		return times[0] + ":" + times[1];
 	}	
 	
+	public String getFromStation()
+	{
+		return _validFromStation;
+	}
+	
 	public String getToStation()
 	{
 		return _validToStation;
@@ -100,6 +105,16 @@ public class Ticket
 	public String getTicketType()
 	{
 		return _ticketType;
+	}
+	
+	public String getSeat()
+	{
+		return _seatReservation;
+	}
+	
+	public String getTicketClass()
+	{
+		return _ticketClass;
 	}
 	
 	private String getValidityTime()
@@ -120,6 +135,11 @@ public class Ticket
 	public int getTicketID()
 	{
 		return _ticketID;
+	}
+	
+	public int getServiceID()
+	{
+		return _serviceID;
 	}
 	
 	private String getValidityDate()

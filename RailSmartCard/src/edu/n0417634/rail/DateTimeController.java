@@ -40,6 +40,11 @@ public class DateTimeController
 	{
 		int hoursNow = _calendar.get(Calendar.HOUR_OF_DAY);
 		int minutesNow = _calendar.get(Calendar.MINUTE);
-		return Integer.parseInt(Integer.toString(hoursNow) + Integer.toString(minutesNow));
+		
+		if(minutesNow < 10)		
+		{
+			return Integer.parseInt(Integer.toString(hoursNow) + "0" + Integer.parseInt(Integer.toString(minutesNow)));
+		}			
+		return Integer.parseInt(Integer.toString(hoursNow) + "0" + Integer.parseInt(Integer.toString(minutesNow)));
 	}
 }
