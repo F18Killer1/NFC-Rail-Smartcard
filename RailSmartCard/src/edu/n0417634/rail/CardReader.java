@@ -89,9 +89,9 @@ public class CardReader
 			//} 
 		}
 		
-		//System.out.println("Executing SHUTDOWN procedures...");
+		System.out.println("Executing SHUTDOWN procedures...");
 		dbm.closeDBConnection();
-		//System.out.println("-> Terminating all services\t\t[ SUCCESS ]");
+		System.out.println("-> Terminating all services\t\t[ SUCCESS ]");
 		System.exit(0);
 	}
 	

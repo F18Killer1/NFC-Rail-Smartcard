@@ -1,0 +1,6 @@
+1001:Nottingham -> Birmingham New St
+1002:Birmingham New St -> Nottingham
+1003:Nottingham -> Derby
+1004:Derby -> Nottingham
+1005:Derby -> Birmingham New St
+1006:Birmingham New St -> Derby

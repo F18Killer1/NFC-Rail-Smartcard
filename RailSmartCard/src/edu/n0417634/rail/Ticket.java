@@ -107,6 +107,11 @@ public class Ticket
 		return _ticketType;
 	}
 	
+	public String getAgeGroup()
+	{
+		return _ageGroup;
+	}
+	
 	public String getSeat()
 	{
 		return _seatReservation;
@@ -125,6 +130,11 @@ public class Ticket
 	public String getErrorMessage()
 	{
 		return _errorMessage;
+	}
+	
+	public void setErrorMessage(String msg)
+	{
+		_errorMessage = msg;
 	}
 	
 	public Boolean getIsUsed()

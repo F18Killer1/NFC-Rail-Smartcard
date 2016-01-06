@@ -52,25 +52,31 @@ public class TicketHandler
 		{
 			if(_isValidTicket == false)
 			{
-				_position = i;
-				_isValidTicket = _tickets.get(i).isTicketValid(_tickets.get(i));
+				if(_tickets.get(i).getServiceID() == _reader.getServiceID())
+				{
+					_position = i;
+					_isValidTicket = _tickets.get(i).isTicketValid(_tickets.get(i));
+				}
+				else
+				{
+					_tickets.get(i).setErrorMessage("Ticket not valid for this service!");
+				}
 			}
 		}
 		
 		if(_isValidTicket)
 		{		
 			Ticket tkt = _tickets.get(_position);
-			String tktType = tkt.getTicketType();
+			String tktType = tkt.getAgeGroup() + " " + tkt.getTicketType();
 			
 			
 			System.out.println("*-----------------------------*");
 			System.out.println("* TICKET VALID!");
 			System.out.println("*-----------------------------*");
-			System.out.println("TYPE  : " + tktType.toUpperCase());
-			System.out.println("CLASS  : " + tkt.getTicketClass());
-			System.out.println("FROM  : " + tkt.getFromStation());
-			System.out.println("TO  : " + tkt.getToStation());
-			System.out.println("SEAT  : " + tkt.getSeat());
+			System.out.println("TYPE:\t" + tktType.toUpperCase());
+			System.out.println("CLASS:\t" + tkt.getTicketClass());
+			System.out.println("TRIP:\t" + tkt.getFromStation() + " -> " + tkt.getToStation());
+			System.out.println("SEAT:\t" + tkt.getSeat());
 			System.out.println("*-----------------------------*");
 			
 			for(int i=0;  i < _tickets.size();	i++)
@@ -92,12 +98,12 @@ public class TicketHandler
 			System.out.println("*-----------------------------*");
 			System.out.println("* TICKET INVALID!");
 			System.out.println("*-----------------------------*");
-			System.out.println("This is service: " + _reader.getServiceID() + "\n");
+			System.out.println("This is service: " + _reader.getServiceID());
 			
 			for(int i=0;  i < _tickets.size();	i++)
 			{
-				System.out.println("T# " + _tickets.get(i).getTicketID() + " S# " + _tickets.get(i).getServiceID() + " " +_tickets.get(i).getFromStation() + " TO " + _tickets.get(i).getToStation());
-				System.out.println(_tickets.get(i).getErrorMessage() + "\n");
+				System.out.println("\nT# " + _tickets.get(i).getTicketID() + " S# " + _tickets.get(i).getServiceID() + " " +_tickets.get(i).getFromStation() + " TO " + _tickets.get(i).getToStation());
+				System.out.println(_tickets.get(i).getErrorMessage());
 			
 			}
 			System.out.println("*-----------------------------*");

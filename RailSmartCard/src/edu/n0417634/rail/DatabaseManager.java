@@ -6,15 +6,14 @@ import java.util.*;
 
 public class DatabaseManager 
 { 
-	final private static String URL = "jdbc:mysql://localhost:3306/electronicadvancetickets";
-	final private static String USERNAME = "SYSTEM";
+	final private static String URL = "jdbc:mysql://localhost:3306/etickets";
+	final private static String USERNAME = "operations";
 	final private static String PASSWORD = "5p5$Dmh_YAcA";
 	
 	private static Connection _connection;
 	private Card _card;
 	private CardReader _reader;
 	private DateTimeController _dtControl;
-	private TicketHandler _ticketHandler;
 		
 	DatabaseManager()
 	{
@@ -121,7 +120,6 @@ public class DatabaseManager
 		else
 		{
 			new TicketHandler(results, _reader);
-			System.out.println("I am at the end of conductor code");
 		}
 		results.close();
 	}
