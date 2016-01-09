@@ -7,7 +7,6 @@ public class DateTimeController
 {
 	private Calendar _calendar;
 	private String _todaysDate;
-	private String _timeNow;
 	
 	DateTimeController()
 	{
@@ -20,15 +19,19 @@ public class DateTimeController
 		int day =  _calendar.get(Calendar.DAY_OF_MONTH);
 		int month =  _calendar.get(Calendar.MONTH) +1;
 		int year =  _calendar.get(Calendar.YEAR);
+		String day_str = Integer.toString(day);
+		String mon_str = Integer.toString(month);
 				
 		if(day < 10) 
 		{ 
-			_todaysDate = year + "-" + month + "-" + "0" + day; 
+			day_str = "0" + day;
 		}
-		else 
+		
+		if(month < 10) 
 		{ 
-			_todaysDate = year + "-" + month + "-" + day; 
+			mon_str = "0" + month; 
 		}
+		_todaysDate = year + "-" + mon_str + "-" + day_str;		
 	}
 	
 	public String getTodaysDate()
@@ -44,7 +47,7 @@ public class DateTimeController
 		if(minutesNow < 10)		
 		{
 			return Integer.parseInt(Integer.toString(hoursNow) + "0" + Integer.parseInt(Integer.toString(minutesNow)));
-		}			
+		}
 		return Integer.parseInt(Integer.toString(hoursNow) + Integer.parseInt(Integer.toString(minutesNow)));
 	}
 }

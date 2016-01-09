@@ -8,7 +8,7 @@ public class DatabaseManager
 { 
 	final private static String URL = "jdbc:mysql://localhost:3306/etickets";
 	final private static String USERNAME = "operations";
-	final private static String PASSWORD = "5p5$Dmh_YAcA";
+	final private static String PASSWORD = "5p5£Dmh_YAcA";
 	
 	private static Connection _connection;
 	private Card _card;
