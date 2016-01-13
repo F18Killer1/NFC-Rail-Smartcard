@@ -28,7 +28,6 @@ public class CardReader
 		this._serviceID =0;
 		this._mode = "STATION";
 		
-		//System.out.println("Boot sequence\t\t[ SUCCESS ]");
 		System.out.println("SYSTEM RUNNING IN STATION MODE AT ** " + this._stationName.toUpperCase() + " **");
 	}
 	
@@ -38,7 +37,6 @@ public class CardReader
 		this._stationName = null;
 		this._mode = "CONDUCTOR";
 		
-		//System.out.println("Boot sequence\t\t[ SUCCESS ]");
 		System.out.println("SYSTEM RUNNING IN CONDUCTOR MODE ON SERVICE ID: " + this._serviceID );
 	}
 	
@@ -66,7 +64,7 @@ public class CardReader
 				if (cardValidated) 
 				{ 
 					String id_str = retrieveCardID(readIDFile()); */
-					String id_str = "94"; //UNCOMMENT
+					String id_str = "324700003"; //UNCOMMENT
 													
 					if (id_str.equals("SHUTDOWN"))
 					{

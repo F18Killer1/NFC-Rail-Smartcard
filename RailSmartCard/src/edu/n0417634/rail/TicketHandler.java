@@ -46,7 +46,7 @@ public class TicketHandler
 		}
 	}
 	
-	private void checkValidConductorTicket()
+	private void checkValidConductorTicket() throws SQLException
 	{
 		for(int i=0;  i < _tickets.size();	i++)
 		{

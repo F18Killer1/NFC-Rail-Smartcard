@@ -23,8 +23,6 @@ public class CardReaderManager
 	
 	public void start() throws SQLException
 	{
-		//System.out.println("Initiating boot sequence...\n");
-
 		//***** DEBUG CODE ********
 		//new CardReader("nottingham").run();
 		//new CardReader(1006).run();

@@ -1,5 +1,7 @@
 package edu.n0417634.rail;
 
+import java.sql.SQLException;
+
 public class Ticket 
 {
 	private int _ticketID, _cardID, _serviceID;
@@ -45,7 +47,7 @@ public class Ticket
 		_errorMessage = null;
 	}
 	
-	public Boolean isTicketValid(Ticket tkt)
+	public Boolean isTicketValid(Ticket tkt) throws SQLException
 	{		
 		if(this.getTicketType().contains("Advance"))
 		{
@@ -56,6 +58,8 @@ public class Ticket
 			if(timeDiff > 0)
 			{
 				_errorMessage = "Ticket expired on " + this.formatDate(this.getValidityDate()) + " at " + this.stripSeconds(this.getValidityTime());
+				String updateQuery = "UPDATE ticket SET isUsed=1 WHERE ticketID=" + tkt.getTicketID() + ";";
+				DatabaseManager.updateDatabase(updateQuery);
 				return false;
 			}
 			else if (timeDiff < -100)
