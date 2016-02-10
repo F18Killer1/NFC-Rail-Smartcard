@@ -115,7 +115,7 @@ public class TicketHandler
 	{
 		for(int i=0;  i < _tickets.size();	i++)
 		{
-			if(_isValidTicket == false)
+			if(!_isValidTicket)
 			{
 				_position = i;
 				_isValidTicket = _tickets.get(i).isTicketValid(_tickets.get(i));
@@ -140,14 +140,12 @@ public class TicketHandler
 		}
 		
 		Ticket tkt = _tickets.get(_position);
-		
-		if (tkt.getTicketType().contains("Advance"))
+			
+		if(!tkt.getIsUsed() && tkt.getToStation().equals(_reader.getStationName()))
 		{
-			if(!tkt.getIsUsed() && tkt.getToStation().equals(_reader.getStationName()))
-			{
-				String updateQuery = "UPDATE ticket SET isUsed=1 WHERE ticketID=" + tkt.getTicketID() + ";";
-				DatabaseManager.updateDatabase(updateQuery);
-			}
+			String updateQuery = "UPDATE ticket SET isUsed=1 WHERE ticketID=" + tkt.getTicketID() + ";";
+			DatabaseManager.updateDatabase(updateQuery);
 		}
+		
 	}
 }
