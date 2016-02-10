@@ -1,6 +1,29 @@
-1001:Nottingham -> Birmingham New St
-1002:Birmingham New St -> Nottingham
-1003:Nottingham -> Derby
-1004:Derby -> Nottingham
-1005:Derby -> Birmingham New St
-1006:Birmingham New St -> Derby
+1001:Nottingham	-> Birmingham New St
+1002:Nottingham	-> Birmingham New St
+1003:Nottingham	-> Birmingham New St
+1004:Nottingham	-> Birmingham New St
+1005:Nottingham	-> Birmingham New St
+1006:Nottingham	-> Birmingham New St
+1007:Birmingham New St	-> Nottingham
+1008:Birmingham New St	-> Nottingham
+1009:Birmingham New St	-> Nottingham
+1010:Birmingham New St	-> Nottingham
+1011:Birmingham New St	-> Nottingham
+1012:Birmingham New St	-> Nottingham
+1013:Nottingham	-> Derby
+1014:Nottingham	-> Derby
+1015:Nottingham	-> Derby
+1016:Nottingham	-> Derby
+1017:Nottingham	-> Derby
+1018:Derby -> Nottingham
+1019:Derby -> Nottingham
+1020:Derby -> Nottingham
+1021:Derby -> Nottingham
+1022:Derby -> Nottingham
+1023:Derby -> Nottingham
+1024:Derby -> Birmingham New St
+1025:Derby -> Birmingham New St
+1026:Derby -> Birmingham New St
+1027:Birmingham New St -> Derby
+1028:Birmingham New St -> Derby
+1029:Birmingham New St -> Derby

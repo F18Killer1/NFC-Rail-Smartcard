@@ -34,16 +34,16 @@ public class CardReaderManager
 		
 		switch (mode)
 		{
-		case 1: System.out.print("--> Select station: \n");
-				
+		case 1: 				
 				for(int i=0;	i<_stations.size();	i++)
 				{
 					System.out.println("--> " + _stations.get(i));
 				}
 				
+				System.out.print("\n--> Select station: \n");
 				int stationInt = scanner.nextInt();
 				Boolean validStation = validateStationID(stationInt);
-				
+								
 				if(validStation)
 				{
 					new CardReader(getStationName(stationInt)).run();
@@ -53,19 +53,19 @@ public class CardReaderManager
 					throwExit();
 				}
 				
-		case 2: System.out.print("--> Enter service ID: \n");
-		
+		case 2: 		
 				for(int i=0;	i<_services.size();	i++)
 				{
 					System.out.println("--> " + _services.get(i));
 				}
 				
-				int services = scanner.nextInt();
-				Boolean validService = validateServiceID(services);
+				System.out.print("\n--> Enter service ID: \n");
+				int serviceInt = scanner.nextInt();
+				Boolean validService = validateServiceID(serviceInt);
 
 				if(validService)
 				{
-					new CardReader(services).run();
+					new CardReader(serviceInt).run();
 				}
 				else
 				{
