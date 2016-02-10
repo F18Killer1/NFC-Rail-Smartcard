@@ -59,7 +59,15 @@ public class TicketHandler
 				}
 				else
 				{
-					_tickets.get(i).setErrorMessage("Ticket not valid for this service!");
+					if(_tickets.get(i).getTicketType().equals("Off-Peak")) 
+					{
+						_position = i;
+						_isValidTicket = _tickets.get(i).isTicketValid(_tickets.get(i), "conductor");
+					}
+					else 
+					{
+						_tickets.get(i).setErrorMessage("Ticket not valid for this service!");
+					}
 				}
 			}
 		}
@@ -69,36 +77,48 @@ public class TicketHandler
 			Ticket tkt = _tickets.get(_position);
 			String tktType = tkt.getAgeGroup() + " " + tkt.getTicketType();
 			
-			
-			System.out.println("*-----------------------------*");
-			System.out.println("* TICKET VALID!");
-			System.out.println("*-----------------------------*");
-			System.out.println("TYPE:\t" + tktType.toUpperCase());
-			System.out.println("CLASS:\t" + tkt.getTicketClass());
-			System.out.println("TRIP:\t" + tkt.getFromStation() + " -> " + tkt.getToStation());
-			
-			if(tktType.contains("Advance")) 
+			if(_tickets.get(_position).getTicketType().equals("Off-Peak")) 
 			{
-				System.out.println("SEAT:\t" + tkt.getSeat());
+				System.out.println("*-----------------------------*");
+				System.out.println("* !!! -- CHECK TICKET -- !!!");
+				System.out.println("*-----------------------------*");
+				System.out.println("TYPE:\t" + tktType.toUpperCase());
+				System.out.println("CLASS:\t" + tkt.getTicketClass());
+				System.out.println("TRIP:\t" + tkt.getFromStation() + " -> " + tkt.getToStation());
+				System.out.println("*-----------------------------*");
 			}
-			System.out.println("*-----------------------------*");
-			
-			for(int i=0;  i < _tickets.size();	i++)
+			else
 			{
+				System.out.println("*-----------------------------*");
+				System.out.println("* TICKET VALID!");
+				System.out.println("*-----------------------------*");
+				System.out.println("TYPE:\t" + tktType.toUpperCase());
+				System.out.println("CLASS:\t" + tkt.getTicketClass());
+				System.out.println("TRIP:\t" + tkt.getFromStation() + " -> " + tkt.getToStation());
 				
-				if(_tickets.get(i).getServiceID() == _reader.getServiceID())
+				if(tktType.contains("Advance")) 
 				{
-					System.out.println("--> " + _tickets.get(i).getFromStation() + " TO " + _tickets.get(i).getToStation());
+					System.out.println("SEAT:\t" + tkt.getSeat());
 				}
-				else
+				System.out.println("*-----------------------------*");
+				
+				for(int i=0;  i < _tickets.size();	i++)
 				{
-					if(tktType.contains(_tickets.get(i).getTicketType())) 
+					
+					if(_tickets.get(i).getServiceID() == _reader.getServiceID())
 					{
-						System.out.println(_tickets.get(i).getFromStation() + " TO " + _tickets.get(i).getToStation());
+						System.out.println("--> " + _tickets.get(i).getFromStation() + " TO " + _tickets.get(i).getToStation());
+					}
+					else
+					{
+						if(tktType.contains(_tickets.get(i).getTicketType())) 
+						{
+							System.out.println(_tickets.get(i).getFromStation() + " TO " + _tickets.get(i).getToStation());
+						}
 					}
 				}
+				System.out.println("*-----------------------------*\n");
 			}
-			System.out.println("*-----------------------------*\n");
 		}
 		else
 		{
@@ -109,7 +129,8 @@ public class TicketHandler
 			
 			for(int i=0;  i < _tickets.size();	i++)
 			{
-				System.out.println("\nT#" + _tickets.get(i).getTicketID() + ", S#" + _tickets.get(i).getServiceID() + " " +_tickets.get(i).getFromStation() + " TO " + _tickets.get(i).getToStation());
+				System.out.println("\nT#" + _tickets.get(i).getTicketID() + ", S#" + _tickets.get(i).getServiceID() + " " +_tickets.get(i).getFromStation() + " TO " + _tickets.get(i).getToStation() +  
+						" (" + _tickets.get(i).getTicketType() + ")");
 				System.out.println(_tickets.get(i).getErrorMessage());
 			
 			}
