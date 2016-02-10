@@ -50,26 +50,15 @@ public class TicketHandler
 	{
 		for(int i=0;  i < _tickets.size();	i++)
 		{
-			if(!_isValidTicket)
+			if((_tickets.get(i).getServiceID() == _reader.getServiceID()) || (_tickets.get(i).getTicketType().equals("Off-Peak")))
 			{
-				if(_tickets.get(i).getServiceID() == _reader.getServiceID())
-				{
-					_position = i;
-					_isValidTicket = _tickets.get(i).isTicketValid(_tickets.get(i), "conductor");
-				}
-				else
-				{
-					if(_tickets.get(i).getTicketType().equals("Off-Peak")) 
-					{
-						_position = i;
-						_isValidTicket = _tickets.get(i).isTicketValid(_tickets.get(i), "conductor");
-					}
-					else 
-					{
-						_tickets.get(i).setErrorMessage("Ticket not valid for this service!");
-					}
-				}
+				_position = i;
+				_isValidTicket = true;
 			}
+			else
+			{
+				_tickets.get(i).setErrorMessage("Ticket not valid for this service!");
+			}			
 		}
 		
 		if(_isValidTicket)
@@ -146,7 +135,7 @@ public class TicketHandler
 			if(!_isValidTicket)
 			{
 				_position = i;
-				_isValidTicket = _tickets.get(i).isTicketValid(_tickets.get(i), "station");
+				_isValidTicket = _tickets.get(i).isTicketValid(_tickets.get(i));
 			}
 		}
 		

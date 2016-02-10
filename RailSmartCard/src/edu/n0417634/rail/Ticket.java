@@ -47,7 +47,7 @@ public class Ticket
 		_errorMessage = null;
 	}
 	
-	public Boolean isTicketValid(Ticket tkt, String mode) throws SQLException
+	public Boolean isTicketValid(Ticket tkt) throws SQLException
 	{		
 		if(this.getTicketType().contains("Advance"))
 		{
@@ -64,15 +64,8 @@ public class Ticket
 			}
 			else if (timeDiff < -100)
 			{
-				if(mode.equals("station"))
-				{
-					_errorMessage = "Ticket valid on " + this.formatDate(this.getValidityDate()) +  " between " + this.getValidityStartTime(this.getValidityTime()) 
+				_errorMessage = "Ticket valid on " + this.formatDate(this.getValidityDate()) +  " between " + this.getValidityStartTime(this.getValidityTime()) 
 													+ " and " + this.stripSeconds(this.getValidityTime());
-				}
-				else 
-				{
-					_errorMessage = "Ticket valid on " + this.formatDate(this.getValidityDate()) +  " at " + this.stripSeconds(this.getValidityTime());
-				}
 				return false;
 			}
 		}
