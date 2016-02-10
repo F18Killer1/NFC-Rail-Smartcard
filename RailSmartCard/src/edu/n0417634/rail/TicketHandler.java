@@ -50,12 +50,12 @@ public class TicketHandler
 	{
 		for(int i=0;  i < _tickets.size();	i++)
 		{
-			if(_isValidTicket == false)
+			if(!_isValidTicket)
 			{
 				if(_tickets.get(i).getServiceID() == _reader.getServiceID())
 				{
 					_position = i;
-					_isValidTicket = _tickets.get(i).isTicketValid(_tickets.get(i));
+					_isValidTicket = _tickets.get(i).isTicketValid(_tickets.get(i), "conductor");
 				}
 				else
 				{
@@ -76,7 +76,11 @@ public class TicketHandler
 			System.out.println("TYPE:\t" + tktType.toUpperCase());
 			System.out.println("CLASS:\t" + tkt.getTicketClass());
 			System.out.println("TRIP:\t" + tkt.getFromStation() + " -> " + tkt.getToStation());
-			System.out.println("SEAT:\t" + tkt.getSeat());
+			
+			if(tktType.contains("Advance")) 
+			{
+				System.out.println("SEAT:\t" + tkt.getSeat());
+			}
 			System.out.println("*-----------------------------*");
 			
 			for(int i=0;  i < _tickets.size();	i++)
@@ -88,7 +92,10 @@ public class TicketHandler
 				}
 				else
 				{
-					System.out.println(_tickets.get(i).getFromStation() + " TO " + _tickets.get(i).getToStation());
+					if(tktType.contains(_tickets.get(i).getTicketType())) 
+					{
+						System.out.println(_tickets.get(i).getFromStation() + " TO " + _tickets.get(i).getToStation());
+					}
 				}
 			}
 			System.out.println("*-----------------------------*\n");
@@ -102,7 +109,7 @@ public class TicketHandler
 			
 			for(int i=0;  i < _tickets.size();	i++)
 			{
-				System.out.println("\nT# " + _tickets.get(i).getTicketID() + " S# " + _tickets.get(i).getServiceID() + " " +_tickets.get(i).getFromStation() + " TO " + _tickets.get(i).getToStation());
+				System.out.println("\nT#" + _tickets.get(i).getTicketID() + ", S#" + _tickets.get(i).getServiceID() + " " +_tickets.get(i).getFromStation() + " TO " + _tickets.get(i).getToStation());
 				System.out.println(_tickets.get(i).getErrorMessage());
 			
 			}
@@ -118,7 +125,7 @@ public class TicketHandler
 			if(!_isValidTicket)
 			{
 				_position = i;
-				_isValidTicket = _tickets.get(i).isTicketValid(_tickets.get(i));
+				_isValidTicket = _tickets.get(i).isTicketValid(_tickets.get(i), "station");
 			}
 		}
 		
