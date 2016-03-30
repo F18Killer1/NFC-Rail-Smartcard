@@ -22,12 +22,7 @@ public class CardReaderManager
 	CardReaderManager() {}	
 	
 	public void start() throws SQLException
-	{
-		//***** DEBUG CODE ********
-		//new CardReader("nottingham").run();
-		//new CardReader(1006).run();
-		//**** END DEBUG CODE *****
-		
+	{	
 		Scanner scanner = new Scanner(System.in);
 		System.out.print("-> Enter operating mode (1:Station, 2:Conductor): ");
 		int mode = scanner.nextInt();

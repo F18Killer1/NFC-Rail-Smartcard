@@ -74,6 +74,7 @@ public class TicketHandler
 				System.out.println("TYPE:\t" + tktType.toUpperCase());
 				System.out.println("CLASS:\t" + tkt.getTicketClass());
 				System.out.println("TRIP:\t" + tkt.getFromStation() + " -> " + tkt.getToStation());
+				System.out.println("SEAT:\t" + tkt.getSeat());
 				System.out.println("*-----------------------------*");
 			}
 			else
@@ -84,11 +85,7 @@ public class TicketHandler
 				System.out.println("TYPE:\t" + tktType.toUpperCase());
 				System.out.println("CLASS:\t" + tkt.getTicketClass());
 				System.out.println("TRIP:\t" + tkt.getFromStation() + " -> " + tkt.getToStation());
-				
-				if(tktType.contains("Advance")) 
-				{
-					System.out.println("SEAT:\t" + tkt.getSeat());
-				}
+				System.out.println("SEAT:\t" + tkt.getSeat());
 				System.out.println("*-----------------------------*");
 				
 				for(int i=0;  i < _tickets.size();	i++)
@@ -135,7 +132,7 @@ public class TicketHandler
 			if(!_isValidTicket)
 			{
 				_position = i;
-				_isValidTicket = _tickets.get(i).isTicketValid(_tickets.get(i));
+				_isValidTicket = _tickets.get(i).isTicketValid(_tickets.get(i), _reader.getStationName());
 			}
 		}
 		
@@ -145,7 +142,7 @@ public class TicketHandler
 			System.out.println("* TICKET VALID!");
 			System.out.println("*-----------------------------*");
 			System.out.println("* OPENING BARRIERS AT " + _reader.getStationName().toUpperCase());
-			System.out.println("*-----------------------------*\n");
+			System.out.println("*-----------------------------*");
 		}
 		else
 		{

@@ -47,9 +47,9 @@ public class Ticket
 		_errorMessage = null;
 	}
 	
-	public Boolean isTicketValid(Ticket tkt) throws SQLException
+	public Boolean isTicketValid(Ticket tkt, String _reader) throws SQLException
 	{		
-		if(this.getTicketType().contains("Advance"))
+		if((this.getTicketType().contains("Advance") && (!_reader.equals(tkt.getToStation()))))
 		{
 			int timeNow = new DateTimeController().getTimeNow();
 			int ticketTime = this.stripColon(this.getValidityTime());

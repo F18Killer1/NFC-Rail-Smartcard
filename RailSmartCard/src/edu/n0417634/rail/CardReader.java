@@ -57,14 +57,13 @@ public class CardReader
 				_isMessageDisplayed = true;
 			}
 			systemPause();
-			/*if (doesIDFileExist()) 
+			if (doesIDFileExist()) 
 			{
 				Boolean cardValidated = validateCardID(retrieveCardID(readIDFile())); 
 				
 				if (cardValidated) 
 				{ 
-					String id_str = retrieveCardID(readIDFile()); */
-					String id_str = "324700003"; //UNCOMMENT
+					String id_str = retrieveCardID(readIDFile());
 													
 					if (id_str.equals("SHUTDOWN"))
 					{
@@ -75,16 +74,14 @@ public class CardReader
 					{
 						int id_int = Integer.parseInt(id_str);
 						dbm.performDatabaseOperations(new Card(id_int), this);
-						
-						break; //DEBUG
 					}
-				//} //C
-				/*else //C
-				{ //C
-					System.out.println("Card unable to be validated, please try again or seek assistance!\n"); //C
-				} //C*/
+				} 
+				else 
+				{ 
+					System.out.println("Card unable to be validated, please try again or seek assistance!\n");
+				} 
 				resetMachine(); 
-			//} 
+			}
 		}
 		
 		System.out.println("Executing SHUTDOWN procedures...");
